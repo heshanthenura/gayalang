@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/heshanthenura/gayalang/internal/lexer"
+	"github.com/heshanthenura/gayalang/internal/parser"
 )
 
 func main() {
@@ -20,11 +21,17 @@ request getData {
 }
 `
 
-	lex := lexer.New(input)
+	l := lexer.New(input)
+	p := parser.New(l)
 
-	fmt.Println("Tokens:")
-	for tok := lex.NextToken(); tok.Type != lexer.EOF; tok = lex.NextToken() {
-		fmt.Printf("[%d:%d] %-10s : %q\n", tok.Line, tok.Column, tok.Type, tok.Literal)
+	program := p.ParseProgram()
+
+	for _, req := range program.Requests {
+		fmt.Println("Request:", req.Name)
+		fmt.Println(" Method:", req.Method)
+		fmt.Println(" URL:", req.URL)
+		fmt.Println(" Expect Status:", req.Expect.Status)
+		fmt.Println(" Save Var:", req.SaveVar)
+		fmt.Println("---")
 	}
-	fmt.Println("EOF reached")
 }
