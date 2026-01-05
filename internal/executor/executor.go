@@ -6,24 +6,21 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/fatih/color"
 	"github.com/heshanthenura/gayalang/internal/ast"
+	"github.com/heshanthenura/gayalang/internal/colors"
 )
 
 type Context map[string]string
 
 func ExecuteProgram(prog *ast.Program) Context {
-	red := color.New(color.FgRed).SprintFunc()
-	green := color.New(color.FgGreen).SprintFunc()
-
 	ctx := Context{}
 
 	for _, req := range prog.Requests {
 		status, body := executeRequest(req, ctx)
 		if req.Expect.Status != 0 && status != req.Expect.Status {
-			fmt.Printf("%s Request %s failed: expected %d but got %d\n", red("[FAILED]"), req.Name, req.Expect.Status, status)
+			fmt.Printf("%s Request %s failed: expected %d but got %d\n", colors.Red("[FAILED]"), req.Name, req.Expect.Status, status)
 		} else {
-			fmt.Printf("%s Request %s succeeded: %d\n", green("[PASS]  "), req.Name, status)
+			fmt.Printf("%s Request %s succeeded: %d\n", colors.Green("[PASS]  "), req.Name, status)
 		}
 
 		if req.SaveVar != "" {

@@ -34,9 +34,10 @@ const (
 	DELETE TokenType = "DELETE"
 
 	// Symbols
-	LBRACE TokenType = "{"
-	RBRACE TokenType = "}"
-	EQUALS TokenType = "="
+	LBRACE  TokenType = "{"
+	RBRACE  TokenType = "}"
+	EQUALS  TokenType = "="
+	COMMENT TokenType = "//"
 )
 
 var keywords = map[string]TokenType{

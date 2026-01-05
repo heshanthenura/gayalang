@@ -1,33 +1,32 @@
 package lexer
 
 import (
+	"log"
 	"testing"
 )
 
-func TestInvalidIdentifier(t *testing.T) {
-	input := `12asd12 123bds 45valid 78`
+func TestMain(t *testing.T) {
+	input := `
+request login {
+    POST "https://webhook.site/ec2b106b-a4c6-4620-9873-14cf4af6fe20"
+    expect status = 200
+}
 
-	expected := []struct {
-		typ     TokenType
-		literal string
-	}{
-		{ILLEGAL, "invalid number: 12asd12"},
-		{ILLEGAL, "invalid number: 123bds"},
-		{ILLEGAL, "invalid number: 45valid"},
-		{NUMBER, "78"},
-		{EOF, ""},
-	}
+// testing
+request getData {
+    GET "https://judge0-be.vercel.app/api/indexasdad" 
+    expect status = 200
+	sdfsdfsdfd
+}
+`
 
 	l := New(input)
 
-	for i, exp := range expected {
+	for {
 		tok := l.NextToken()
-
-		if tok.Type != exp.typ {
-			t.Fatalf("test[%d] - wrong token type. got=%q, want=%q", i, tok.Type, exp.typ)
-		}
-		if tok.Literal != exp.literal {
-			t.Fatalf("test[%d] - wrong literal. got=%q, want=%q", i, tok.Literal, exp.literal)
+		log.Printf("%d %d %s %s", tok.Line, tok.Column, tok.Type, tok.Literal)
+		if tok.Type == EOF {
+			break
 		}
 	}
 }

@@ -14,7 +14,7 @@ func New(input string) *Lexer {
 		input: input,
 		line:  1,
 	}
-	l.readChar() // set first character
+	l.readChar()
 	return l
 }
 
@@ -26,9 +26,17 @@ func (l *Lexer) readChar() {
 	}
 	l.position = l.readPosition
 	l.readPosition++
+
 	if l.ch != 0 {
 		l.column++
 	}
+}
+
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	}
+	return l.input[l.readPosition]
 }
 
 func (l *Lexer) skipWhitespace() {
@@ -42,7 +50,9 @@ func (l *Lexer) skipWhitespace() {
 }
 
 func isLetter(ch byte) bool {
-	return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ch == '_'
+	return ('a' <= ch && ch <= 'z') ||
+		('A' <= ch && ch <= 'Z') ||
+		ch == '_'
 }
 
 func isDigit(ch byte) bool {
@@ -60,29 +70,41 @@ func (l *Lexer) readIdentifierOrNumber() (string, bool) {
 		l.readChar()
 	}
 
-	lit := l.input[start:l.position]
-	return lit, hasLetter
+	return l.input[start:l.position], hasLetter
 }
 
 func (l *Lexer) readString() string {
 	l.readChar()
 	start := l.position
+
 	for l.ch != '"' && l.ch != 0 {
 		l.readChar()
 	}
+
 	value := l.input[start:l.position]
 	l.readChar()
 	return value
 }
 
+func (l *Lexer) readComment() string {
+	start := l.position
+
+	l.readChar()
+	l.readChar()
+
+	for l.ch != '\n' && l.ch != 0 {
+		l.readChar()
+	}
+
+	return l.input[start:l.position]
+}
+
 func (l *Lexer) NextToken() Token {
 	l.skipWhitespace()
 
-	startLine := l.line
-	startCol := l.column
 	tok := Token{
-		Line:   startLine,
-		Column: startCol,
+		Line:   l.line,
+		Column: l.column,
 	}
 
 	switch l.ch {
@@ -96,6 +118,13 @@ func (l *Lexer) NextToken() Token {
 		tok.Type = STRING
 		tok.Literal = l.readString()
 		return tok
+	case '/':
+		if l.peekChar() == '/' {
+			tok.Type = COMMENT
+			tok.Literal = l.readComment()
+			return tok
+		}
+		tok = l.newToken(ILLEGAL, "/")
 	case 0:
 		tok.Type = EOF
 	default:
@@ -104,7 +133,9 @@ func (l *Lexer) NextToken() Token {
 			tok.Type = LookupIdent(lit)
 			tok.Literal = lit
 			return tok
-		} else if isDigit(l.ch) {
+		}
+
+		if isDigit(l.ch) {
 			lit, hasLetter := l.readIdentifierOrNumber()
 			if hasLetter {
 				tok.Type = ILLEGAL
@@ -114,19 +145,19 @@ func (l *Lexer) NextToken() Token {
 			tok.Type = NUMBER
 			tok.Literal = lit
 			return tok
-		} else {
-			tok = l.newToken(ILLEGAL, string(l.ch))
 		}
+
+		tok = l.newToken(ILLEGAL, string(l.ch))
 	}
 
 	l.readChar()
 	return tok
 }
 
-func (l *Lexer) newToken(tokenType TokenType, literal string) Token {
+func (l *Lexer) newToken(t TokenType, lit string) Token {
 	return Token{
-		Type:    tokenType,
-		Literal: literal,
+		Type:    t,
+		Literal: lit,
 		Line:    l.line,
 		Column:  l.column,
 	}
