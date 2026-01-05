@@ -2,24 +2,27 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/heshanthenura/gayalang/internal/lexer"
 	"github.com/heshanthenura/gayalang/internal/parser"
 )
 
 func main() {
-	input := `
-request login {
-    POST "https://api.example.com/login"
-    expect status = 200
-    save var token
-}
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: gaya <filename>")
+		return
+	}
 
-request getData {
-    GET "https://api.example.com/data"
-    expect status = 200
-}
-`
+	filename := os.Args[1]
+
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		fmt.Printf("Error reading file: %v\n", err)
+		return
+	}
+
+	input := string(data)
 
 	l := lexer.New(input)
 	p := parser.New(l)

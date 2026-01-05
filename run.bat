@@ -1,0 +1,1 @@
+go run cmd\gaya\main.go

@@ -1,0 +1,1 @@
+go build -o dist/gaya.exe .\cmd\gaya\main.go
