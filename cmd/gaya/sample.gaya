@@ -1,10 +1,9 @@
 request login {
-    POST "https://api.example.com/login"
+    POST "https://webhook.site/ec2b106b-a4c6-4620-9873-14cf4af6fe20"
     expect status = 200
-    save var token
 }
 
 request getData {
-    GET "https://api.example.com/data"
+    GET "https://webhook.site/ec2b106b-a4c6-4620-9873-14cf4af6fe20"
     expect status = 200
 }

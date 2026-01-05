@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/heshanthenura/gayalang/internal/executor"
 	"github.com/heshanthenura/gayalang/internal/lexer"
 	"github.com/heshanthenura/gayalang/internal/parser"
 )
@@ -29,12 +30,6 @@ func main() {
 
 	program := p.ParseProgram()
 
-	for _, req := range program.Requests {
-		fmt.Println("Request:", req.Name)
-		fmt.Println(" Method:", req.Method)
-		fmt.Println(" URL:", req.URL)
-		fmt.Println(" Expect Status:", req.Expect.Status)
-		fmt.Println(" Save Var:", req.SaveVar)
-		fmt.Println("---")
-	}
+	ctx := executor.ExecuteProgram(program)
+	fmt.Println("Execution context:", ctx)
 }
